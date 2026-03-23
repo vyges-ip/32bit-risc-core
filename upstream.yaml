@@ -1,0 +1,23 @@
+schema_version: "vyges-upstream-v1"
+upstream:
+  type: "standalone"
+  source: https://github.com/vyges/32bit-risc-core
+  branch: main
+  extracted_at: "2026-03-23T21:10:15Z"
+import:
+  rtl:
+    - path: "rtl"
+      map_to: "rtl"
+  testbenches:
+    - path: "tb"
+      map_to: "tb"
+  docs:
+    - path: "docs"
+      map_to: "docs"
+  license:
+    - path: "LICENSE"
+  readme:
+    - path: "README.md"
+license:
+  spdx: Apache-2.0
+  file: LICENSE

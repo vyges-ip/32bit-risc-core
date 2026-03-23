@@ -1,0 +1,222 @@
+{
+  "$schema": "https://vyges.com/schema/v1/vyges-metadata.schema.json",
+  "x-version": "1.0.0",
+  "name": "32bit-risc-core",
+  "version": "0.1.0",
+  "description": "A 32-bit, 5-stage pipelined RISC processor core with Harvard AXI-Lite bus interfaces, configurable single-bit branch prediction, aligned memory enforcement, 16x16 complex multiplier with overflow reporting, CSR/exception support, and interrupt handling.",
+  "license": "Apache-2.0",
+  "maturity": "rtl_verified",
+  "target": ["asic", "fpga"],
+  "design_type": ["digital"],
+  "created": "2025-11-19T11:15:06Z",
+  "updated": "2026-03-23T21:10:15Z",
+  "source": {
+    "type": "git",
+    "url": "https://github.com/vyges-ip/32bit-risc-core",
+    "commit": "main",
+    "private": false,
+    "containsEncryptedPayload": false,
+    "indexing": true
+  },
+  "maintainers": [
+    {
+      "name": "Vyges",
+      "email": "team@vyges.com",
+      "url": "https://vyges.com",
+      "github": "vyges"
+    }
+  ],
+  "interfaces": [
+    {
+      "type": "bus",
+      "direction": "master",
+      "protocol": "AXI-Lite",
+      "port": "imem",
+      "width": 32,
+      "description": "Instruction fetch AXI-Lite master port (read-only). Signals: imem_arvalid_o, imem_arready_i, imem_araddr_o, imem_rvalid_i, imem_rready_o, imem_rdata_i."
+    },
+    {
+      "type": "bus",
+      "direction": "master",
+      "protocol": "AXI-Lite",
+      "port": "dmem",
+      "width": 32,
+      "description": "Data load/store AXI-Lite master port with byte enables and write strobe. Full AXI-Lite write channel (AW+W+B) and read channel (AR+R)."
+    },
+    {
+      "type": "interrupt",
+      "direction": "input",
+      "protocol": "level",
+      "port": "irq_i",
+      "width": 4,
+      "description": "External interrupt inputs. Width configurable via IRQ_LINES parameter (1-16)."
+    },
+    {
+      "type": "clock",
+      "direction": "input",
+      "port": "clk_i",
+      "description": "Main clock input."
+    },
+    {
+      "type": "reset",
+      "direction": "input",
+      "port": "rst_cold_n_i",
+      "polarity": "active_low",
+      "description": "Cold reset (power-on reset). Combined with rst_warm_n_i via internal synchronizer."
+    },
+    {
+      "type": "reset",
+      "direction": "input",
+      "port": "rst_warm_n_i",
+      "polarity": "active_low",
+      "description": "Warm reset (software-triggered). Combined with rst_cold_n_i via internal synchronizer."
+    },
+    {
+      "type": "debug",
+      "direction": "output",
+      "port": "commit",
+      "description": "Commit/debug interface: commit_pc_o (32-bit), commit_valid_o, exception_o."
+    }
+  ],
+  "parameters": [
+    {
+      "name": "BP_ENTRIES",
+      "type": "int",
+      "default": 64,
+      "range": "16-256",
+      "description": "Branch predictor table depth. Single-bit history per entry, indexed by PC[7:2]. Power of 2 recommended."
+    },
+    {
+      "name": "IRQ_LINES",
+      "type": "int",
+      "default": 4,
+      "range": "1-16",
+      "description": "Number of external interrupt input lines."
+    },
+    {
+      "name": "RESET_VECTOR",
+      "type": "int",
+      "default": "0x00010000",
+      "description": "Boot address. PC is set to this value on reset."
+    },
+    {
+      "name": "HAS_MUL",
+      "type": "bool",
+      "default": true,
+      "description": "Enable 16x16 complex multiplier. When false, MUL opcode raises an illegal instruction exception."
+    }
+  ],
+  "performance": {
+    "frequency": {
+      "asic_tsmc_22nm": "600 MHz",
+      "asic_sky130": "50-80 MHz (estimated)",
+      "fpga_artix7": "150 MHz",
+      "fpga_ultrascale": "250 MHz (estimated)"
+    },
+    "pipeline_depth": 5,
+    "pipeline_stages": ["IF", "ID", "EX", "MEM", "WB"],
+    "branch_penalty_cycles": 2,
+    "issue_width": 1,
+    "instruction_set": "Custom 32-bit fixed-width (14 opcodes)",
+    "data_width": 32,
+    "register_file": "32x32-bit, dual-read single-write"
+  },
+  "asic": {
+    "flavor": "digital",
+    "technology": ["TSMC 22nm", "sky130A"],
+    "estimated_area": "0.25 mm^2 (TSMC 22nm), ~2.5 mm^2 (sky130A estimated)",
+    "estimated_gate_count": "50k equivalent gates"
+  },
+  "fpga": {
+    "toolchain": ["Vivado", "Quartus"],
+    "devices": ["Artix-7", "Ultrascale+", "Cyclone V"],
+    "clock_freq_mhz": 150,
+    "resource_estimate": "~8K LUTs, ~4K FFs (Artix-7)"
+  },
+  "architecture": {
+    "type": "processor",
+    "isa": "Custom Stanford RISC (32-bit fixed-width)",
+    "microarchitecture": "5-stage in-order pipeline, single-issue",
+    "features": [
+      "Harvard architecture (separate instruction and data buses)",
+      "Single-bit branch predictor with configurable table depth",
+      "Full data forwarding (EX-to-EX, MEM-to-EX bypasses)",
+      "Aligned memory enforcement with precise exceptions",
+      "16x16 complex multiplier with overflow detection",
+      "CSR register file for status and control",
+      "Dual reset (cold + warm) with internal synchronizer",
+      "Commit/debug interface for trace and verification"
+    ],
+    "instruction_formats": [
+      "R-type: opcode[31:26] rd[25:21] rs1[20:16] rs2[15:11] func[10:0]",
+      "I-type: opcode[31:26] rd[25:21] rs1[20:16] imm[15:0]",
+      "J-type: opcode[31:26] target[25:0]"
+    ],
+    "opcodes": [
+      "NOP", "ALUR", "ADDI", "ANDI", "ORI", "XORI",
+      "LD", "ST", "BEQ", "BNE", "JAL", "JR", "CSR", "MUL"
+    ]
+  },
+  "dependencies": [],
+  "test": {
+    "testbenches": ["systemverilog", "cocotb"],
+    "status": "passing",
+    "simulators": ["verilator", "icarus"],
+    "coverage": "functional",
+    "test_cases": [
+      {
+        "name": "sv_complex_mult",
+        "description": "SystemVerilog testbench: load/store, complex multiply, overflow detection, interrupt handling",
+        "status": "passing"
+      },
+      {
+        "name": "cocotb_complex_mult",
+        "description": "Cocotb regression: mirrors SV tests with Python-based stimulus and checking",
+        "status": "passing"
+      }
+    ]
+  },
+  "documentation": {
+    "design_spec": "docs/32bitrisc_design_specification.md",
+    "architecture": "docs/32bitrisc_architecture_specification.md"
+  },
+  "artifacts": {
+    "rtl": [
+      "rtl/stanford_risc_pkg.sv",
+      "rtl/register_file.sv",
+      "rtl/branch_predictor.sv",
+      "rtl/complex_mul16.sv",
+      "rtl/stanford_risc_core.sv"
+    ],
+    "testbenches": [
+      "tb/systemverilog/stanford_risc_system.sv",
+      "tb/systemverilog/stanford_risc_tb.sv",
+      "tb/systemverilog/stanford_risc_cocotb_top.sv",
+      "tb/cocotb/test_stanford_risc.py"
+    ],
+    "total_rtl_lines": 833
+  },
+  "categories": {
+    "primary": "cpu",
+    "secondary": ["embedded", "pipeline", "dsp"],
+    "tags": ["risc", "32-bit", "5-stage-pipeline", "axi-lite", "harvard-architecture", "branch-predictor", "complex-multiply", "in-order", "single-issue"]
+  },
+  "trust": {
+    "verification_level": "simulation_passing",
+    "tapeout_count": 0,
+    "fpga_validated": false,
+    "formal_verified": false,
+    "maintained": true,
+    "last_activity": "2025-11-19"
+  },
+  "meta": {
+    "template": {
+      "generator": "vyges-cli",
+      "template_version": "1.0.0",
+      "generated_at": "2025-11-19T11:15:06Z"
+    },
+    "schema": {
+      "version": "1.0.0"
+    }
+  }
+}
