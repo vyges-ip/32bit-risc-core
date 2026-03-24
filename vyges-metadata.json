@@ -6,10 +6,15 @@
   "description": "A 32-bit, 5-stage pipelined RISC processor core with Harvard AXI-Lite bus interfaces, configurable single-bit branch prediction, aligned memory enforcement, 16x16 complex multiplier with overflow reporting, CSR/exception support, and interrupt handling.",
   "license": "Apache-2.0",
   "maturity": "rtl_verified",
-  "target": ["asic", "fpga"],
-  "design_type": ["digital"],
+  "target": [
+    "asic",
+    "fpga"
+  ],
+  "design_type": [
+    "digital"
+  ],
   "created": "2025-11-19T11:15:06Z",
-  "updated": "2026-03-23T21:10:15Z",
+  "updated": "2026-03-24T02:12:00Z",
   "source": {
     "type": "git",
     "url": "https://github.com/vyges-ip/32bit-risc-core",
@@ -29,7 +34,7 @@
   "interfaces": [
     {
       "type": "bus",
-      "direction": "master",
+      "direction": "output",
       "protocol": "AXI-Lite",
       "port": "imem",
       "width": 32,
@@ -37,7 +42,7 @@
     },
     {
       "type": "bus",
-      "direction": "master",
+      "direction": "output",
       "protocol": "AXI-Lite",
       "port": "dmem",
       "width": 32,
@@ -114,7 +119,13 @@
       "fpga_ultrascale": "250 MHz (estimated)"
     },
     "pipeline_depth": 5,
-    "pipeline_stages": ["IF", "ID", "EX", "MEM", "WB"],
+    "pipeline_stages": [
+      "IF",
+      "ID",
+      "EX",
+      "MEM",
+      "WB"
+    ],
     "branch_penalty_cycles": 2,
     "issue_width": 1,
     "instruction_set": "Custom 32-bit fixed-width (14 opcodes)",
@@ -123,13 +134,23 @@
   },
   "asic": {
     "flavor": "digital",
-    "technology": ["TSMC 22nm", "sky130A"],
+    "technology": [
+      "TSMC 22nm",
+      "sky130A"
+    ],
     "estimated_area": "0.25 mm^2 (TSMC 22nm), ~2.5 mm^2 (sky130A estimated)",
     "estimated_gate_count": "50k equivalent gates"
   },
   "fpga": {
-    "toolchain": ["Vivado", "Quartus"],
-    "devices": ["Artix-7", "Ultrascale+", "Cyclone V"],
+    "toolchain": [
+      "Vivado",
+      "Quartus"
+    ],
+    "devices": [
+      "Artix-7",
+      "Ultrascale+",
+      "Cyclone V"
+    ],
     "clock_freq_mhz": 150,
     "resource_estimate": "~8K LUTs, ~4K FFs (Artix-7)"
   },
@@ -153,15 +174,33 @@
       "J-type: opcode[31:26] target[25:0]"
     ],
     "opcodes": [
-      "NOP", "ALUR", "ADDI", "ANDI", "ORI", "XORI",
-      "LD", "ST", "BEQ", "BNE", "JAL", "JR", "CSR", "MUL"
+      "NOP",
+      "ALUR",
+      "ADDI",
+      "ANDI",
+      "ORI",
+      "XORI",
+      "LD",
+      "ST",
+      "BEQ",
+      "BNE",
+      "JAL",
+      "JR",
+      "CSR",
+      "MUL"
     ]
   },
   "dependencies": [],
   "test": {
-    "testbenches": ["systemverilog", "cocotb"],
+    "testbenches": [
+      "systemverilog",
+      "cocotb"
+    ],
     "status": "passing",
-    "simulators": ["verilator", "icarus"],
+    "simulators": [
+      "verilator",
+      "icarus"
+    ],
     "coverage": "functional",
     "test_cases": [
       {
@@ -198,8 +237,22 @@
   },
   "categories": {
     "primary": "cpu",
-    "secondary": ["embedded", "pipeline", "dsp"],
-    "tags": ["risc", "32-bit", "5-stage-pipeline", "axi-lite", "harvard-architecture", "branch-predictor", "complex-multiply", "in-order", "single-issue"]
+    "secondary": [
+      "embedded",
+      "pipeline",
+      "dsp"
+    ],
+    "tags": [
+      "risc",
+      "32-bit",
+      "5-stage-pipeline",
+      "axi-lite",
+      "harvard-architecture",
+      "branch-predictor",
+      "complex-multiply",
+      "in-order",
+      "single-issue"
+    ]
   },
   "trust": {
     "verification_level": "simulation_passing",
