@@ -21,3 +21,5 @@ import:
 license:
   spdx: Apache-2.0
   file: LICENSE
+
+metadata_locked: true
